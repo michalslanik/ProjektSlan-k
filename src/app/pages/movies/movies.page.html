@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title class="center-title">Aktuálně populární filmy</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <!-- Řádek pro vyhledávací pole a výběr žánrů -->
+  <ion-row>
+    <ion-col size="6">
+      <ion-item>
+        <ion-label>Žánr</ion-label>
+        <ion-select [(ngModel)]="selectedGenre" (ionChange)="onGenreChange()" placeholder="Filtrace žánrů">
+          <ion-select-option *ngFor="let genre of genres" [value]="genre.id">
+            {{ genre.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-col>
+    <ion-col size="6">
+      <ion-searchbar [(ngModel)]="searchQuery" (ionChange)="onSearchChange()"></ion-searchbar>
+    </ion-col>
+  </ion-row>
+  
+  <!-- Řádek s tlačítky -->
+  <ion-row>
+    <ion-col>
+      <ion-button expand="full" color="success" (click)="sortMoviesByRatingDesc()">
+        Seřadit od nejlepšího hodnocení
+      </ion-button>
+    </ion-col>
+    <ion-col>
+      <ion-button expand="full" color="danger" (click)="sortMoviesByRatingAsc()">
+        Seřadit od nejhoršího hodnocení
+      </ion-button>
+    </ion-col>
+    <ion-col>
+      <ion-button expand="full" color="medium" (click)="resetMovies()">
+        Resetovat filtry
+      </ion-button>
+    </ion-col>
+  </ion-row>
+
+  <ion-list>
+    <ion-item button *ngFor="let item of movies" [routerLink]="[item.id]"> 
+      <ion-avatar slot="start">
+        <img [src]="imageBaseUrl + '/w92' + item.poster_path"/>
+      </ion-avatar>
+      <ion-label>
+        {{ item.title }}
+        <p> Datum vydání: {{item.release_date | date:'y'}}</p>
+      </ion-label>
+      <ion-badge 
+        slot="end" 
+        [color]="item.vote_average > 5 ? 'success' : (item.vote_average === 0 ? 'warning' : 'danger')">
+        {{ item.vote_average === 0 ? 'Příliš málo hodnocení: 0 / 10' : ('Hodnocení: ' + item.vote_average + ' / 10') }}
+      </ion-badge>
+    </ion-item>
+  </ion-list>
+
+  <div style="position: fixed; bottom: 0; width: 100%; display: flex; justify-content: center;">
+    <ion-card class="cardSytle">
+      <ion-button (click)="navigateToAboutAuthor()">Info o Autorovi</ion-button>
+    </ion-card>
+  </div>
+  
+
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Načítání dalších filmů...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
